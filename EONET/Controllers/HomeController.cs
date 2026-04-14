@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace EONET.Controllers
 {
@@ -10,45 +11,27 @@ namespace EONET.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IHttpClientFactory _httpClientFactory;
 
         public HomeController(
             ILogger<HomeController> logger,
-            IConfiguration configuration,
-            IHttpClientFactory httpClientFactory)
+            IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
-            _httpClientFactory = httpClientFactory;
         }
 
+        /// <summary>
+        /// Index action that fetches data from the EONET API, deserializes it, and passes it to the view for display.
+        /// </summary>
+        /// <returns>A view displaying the list of events fetched from the EONET API.</returns>
         public async Task<IActionResult> Index()
         {
-            var apiUrl = _configuration["EonetApiUrl"];
-            if (string.IsNullOrWhiteSpace(apiUrl))
-            {
-                _logger.LogError("Missing configuration value for EonetApiUrl.");
-                return View(new List<EonetEvent>());
-            }
-
-            var client = _httpClientFactory.CreateClient();
+            using HttpClient client = new HttpClient();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            string json = await client.GetStringAsync(_configuration["EonetApiUrl"]);
 
-            try
-            {
-                var response = await client.GetFromJsonAsync<EonetResponse>(apiUrl, options);
-                return View(response?.Events ?? new List<EonetEvent>());
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Failed to fetch data from the EONET API.");
-                return View(new List<EonetEvent>());
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Failed to deserialize data from the EONET API.");
-                return View(new List<EonetEvent>());
-            }
+            var root = JsonSerializer.Deserialize<EonetRoot>(json, options);
+            return View(root?.events ?? new List<Event>());
         }
 
         public IActionResult Privacy()
