@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36616.10 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EONET", "EONET\EONET.csproj", "{F1745646-D11F-4D9D-BAC6-9272BFE9A494}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1745646-D11F-4D9D-BAC6-9272BFE9A494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1745646-D11F-4D9D-BAC6-9272BFE9A494}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1745646-D11F-4D9D-BAC6-9272BFE9A494}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1745646-D11F-4D9D-BAC6-9272BFE9A494}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E722540-6A56-408B-BEE3-8CEF07F14873}
+	EndGlobalSection
+EndGlobal

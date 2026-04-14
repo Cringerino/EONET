@@ -1,0 +1,31 @@
+@model IReadOnlyList<EONET.Models.EonetEvent>
+
+@{
+	ViewData["Title"] = "Natural Events";
+}
+
+<h1 class="mb-4">Natural Events</h1>
+
+<table class="table table-striped table-hover align-middle">
+	<thead>
+		<tr>
+			<th>Title</th>
+			<th>Category</th>
+			<th>Status</th>
+			<th>Description</th>
+			<th>Link</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.Title</td>
+				<td>@string.Join(", ", item.Categories.Select(category => category.Title))</td>
+				<td>@(item.Closed is null ? "Open" : "Closed")</td>
+				<td>@(string.IsNullOrWhiteSpace(item.Description) ? "No description available." : item.Description)</td>
+				<td><a href="@item.Link" target="_blank" rel="noreferrer">Details</a></td>
+			</tr>
+		}
+	</tbody>
+</table>
