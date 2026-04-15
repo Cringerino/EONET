@@ -5,7 +5,14 @@
     /// </summary>
     public class EonetData
     {
-        public List<EonetRoot> Rootobjects { get; set; }
+        public EonetRoot _root { get; set; }
+        public string _name { get; set; }
+        public string _county { get; set; }
+        public string _state { get; set; }
+        public string _link { get; set; }
+        public List<Event> _events { get; set; }
+
+
     }
 
     public class EonetRoot

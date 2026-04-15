@@ -1,4 +1,4 @@
-@model List<EONET.Models.Event>
+@model List<EONET.Models.EonetData>
 
 @{
 	ViewData["Title"] = "Natural Events";
@@ -11,8 +11,9 @@
 <table class="table table-striped table-hover align-middle">
 	<thead>
 		<tr>
-			<th>Title</th>
-			<th>events</th>
+			<th><a asp-action="Index" asp-route-sortOrder="name" style="text-decoration:none;color:inherit;" target="_blank">Name</a></th>
+			<th><a asp-action="Index" asp-route-sortOrder="county" style="text-decoration:none;color:inherit;" target="_blank">County</a></th>
+			<th><a asp-action="Index" asp-route-sortOrder="state" style="text-decoration:none;color:inherit;" target="_blank">State</a></th>
 			<th>Link</th>
 		</tr>
 	</thead>
@@ -20,8 +21,10 @@
 		@foreach (var item in Model)
 		{
 			<tr>
-				<td>@item.title</td>
-				<td><a href="@item.link" target="_blank" rel="noreferrer">Details</a></td>
+				<td>@item._name</td>
+                <td>@item._county</td>
+                <td>@item._state</td>
+				<td><a href="@item._link" target="_blank" rel="noreferrer">Details</a></td>
 			</tr>
 		}
 	</tbody>
