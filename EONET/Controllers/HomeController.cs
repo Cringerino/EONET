@@ -1,5 +1,6 @@
 using EONET.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -9,6 +10,7 @@ namespace EONET.Controllers
 {
     public class HomeController : Controller
     {
+
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
 
@@ -26,39 +28,62 @@ namespace EONET.Controllers
         /// <returns>A view displaying the list of events fetched from the EONET API.</returns>
         public async Task<IActionResult> Index(string sortOrder)
         {
+            try
+            {
+                using HttpClient client = new HttpClient();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+                string json = await client.GetStringAsync(_configuration["EonetApiUrl"]);
+                var root = JsonSerializer.Deserialize<EonetRoot>(json, options);
+
+                //Splits title into name, county amd state.
+                var viewModel = root?.events.Select(item =>
+                {
+                    var parts = (item.title ?? "").Split(',', StringSplitOptions.TrimEntries);
+
+                    return new EonetData
+                    {
+                        _id = item.id ?? "",
+                        _name = parts.Length > 0 ? parts[0] : "",
+                        _county = parts.Length > 1 ? parts[1] : "",
+                        _state = parts.Length > 2 ? parts[2] : "",
+                        _link = item.link ?? ""
+                    };
+                }).ToList() ?? new List<EonetData>();
+
+
+                //Sorts the viewModel based on the sortOrder parameter.
+                viewModel = sortOrder switch
+                {
+                    "nameDesc" => viewModel.OrderByDescending(x => x._name).ToList(),
+                    "county" => viewModel.OrderBy(x => x._county).ToList(),
+                    "countyDesc" => viewModel.OrderByDescending(x => x._county).ToList(),
+                    "state" => viewModel.OrderBy(x => x._state).ToList(),
+                    "stateDesc" => viewModel.OrderByDescending(x => x._state).ToList(),
+                    _ => viewModel.OrderBy(x => x._name).ToList()
+                };
+
+                return View(viewModel);
+            }
+            catch (HttpRequestException)
+            {
+                return View(new List<EonetData>());
+            }
+        }
+
+
+        public async Task<IActionResult> Details(string id)
+        {
             using HttpClient client = new HttpClient();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            string json = await client.GetStringAsync(_configuration["EonetApiUrl"]);
-            var root = JsonSerializer.Deserialize<EonetRoot>(json, options);
+            string json = await client.GetStringAsync($"{_configuration["EonetApiUrl"]}/{id}");
+            //string json = await client.GetStringAsync(id);
+            var root = JsonSerializer.Deserialize<Event>(json, options);
 
-            //Splits title into name, county amd state.
-            var viewModel = root?.events.Select(item =>
-            {
-                var parts = (item.title ?? "").Split(',', StringSplitOptions.TrimEntries);
-
-                return new EonetData
-                {
-                    _name = parts.Length > 0 ? parts[0] : "",
-                    _county = parts.Length > 1 ? parts[1] : "",
-                    _state = parts.Length > 2 ? parts[2] : "",
-                    _link = item.link ?? ""
-                };
-            }).ToList() ?? new List<EonetData>();
-
-            viewModel = sortOrder switch
-            {
-                "nameDesc" => viewModel.OrderByDescending(x => x._name).ToList(),
-                "county" => viewModel.OrderBy(x => x._county).ToList(),
-                "countyDesc" => viewModel.OrderByDescending(x => x._county).ToList(),
-                "state" => viewModel.OrderBy(x => x._state).ToList(),
-                "stateDesc" => viewModel.OrderByDescending(x => x._state).ToList(),
-                _ => viewModel.OrderBy(x => x._name).ToList()
-            };
-
-
-            return View(viewModel);
+            return View(root);
         }
+
 
 
         public IActionResult Privacy()

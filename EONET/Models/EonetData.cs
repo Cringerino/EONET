@@ -5,6 +5,7 @@
     /// </summary>
     public class EonetData
     {
+        public string _id { get; set; }
         public EonetRoot _root { get; set; }
         public string _name { get; set; }
         public string _county { get; set; }

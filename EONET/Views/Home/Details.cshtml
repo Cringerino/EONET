@@ -1,0 +1,45 @@
+﻿@model EONET.Models.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+@if (Model == null)
+{
+    <p>Event not found.</p>
+}
+else
+{
+    <h1 class="mb-4">@Model.title</h1>
+
+
+    @* Table with all fetched events *@
+    <table class="table table-striped">
+        <tr>
+            <th><a asp-action="Index" asp-route-sortOrder="title" style="text-decoration:none;color:inherit;">Title</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="description" style="text-decoration:none;color:inherit;">description</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="link" style="text-decoration:none;color:inherit;">link</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="closed" style="text-decoration:none;color:inherit;">closed</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="categories" style="text-decoration:none;color:inherit;">categories</a></th>
+            <th><a asp-action="Index" asp-route-sortOrder="sources" style="text-decoration:none;color:inherit;">geometry</a></th>
+        </tr>
+        <tr>
+            <td>@Model.id</td>
+            <td>@Model.title</td>
+            <td>@Model.description</td>
+            <td>@Model.closed</td>
+            <td>
+                @foreach (var categorie in Model.categories)
+                {
+                    <p>@categorie.title</p>
+                }
+            </td>
+            <td>
+                @foreach (var source in Model.sources)
+                {
+                    <a href="@source.url" style="text-decoration:none;color:inherit;">Source</a>
+                }
+            </td>
+        </tr>
+    </table>
+}
