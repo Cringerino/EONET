@@ -1,45 +1,86 @@
 ﻿@model EONET.Models.Event
 
 @{
-    ViewData["Title"] = "Event Details";
+	ViewData["Title"] = "Event Details";
 }
 
 @if (Model == null)
 {
-    <p>Event not found.</p>
+	<p>Event not found.</p>
 }
 else
 {
-    <h1 class="mb-4">@Model.title</h1>
 
+	<h1 class="mb-4">@Model.title</h1>
 
-    @* Table with all fetched events *@
-    <table class="table table-striped">
-        <tr>
-            <th><a asp-action="Index" asp-route-sortOrder="title" style="text-decoration:none;color:inherit;">Title</a></th>
-            <th><a asp-action="Index" asp-route-sortOrder="description" style="text-decoration:none;color:inherit;">description</a></th>
-            <th><a asp-action="Index" asp-route-sortOrder="link" style="text-decoration:none;color:inherit;">link</a></th>
-            <th><a asp-action="Index" asp-route-sortOrder="closed" style="text-decoration:none;color:inherit;">closed</a></th>
-            <th><a asp-action="Index" asp-route-sortOrder="categories" style="text-decoration:none;color:inherit;">categories</a></th>
-            <th><a asp-action="Index" asp-route-sortOrder="sources" style="text-decoration:none;color:inherit;">geometry</a></th>
-        </tr>
-        <tr>
-            <td>@Model.id</td>
-            <td>@Model.title</td>
-            <td>@Model.description</td>
-            <td>@Model.closed</td>
-            <td>
-                @foreach (var categorie in Model.categories)
-                {
-                    <p>@categorie.title</p>
-                }
-            </td>
-            <td>
-                @foreach (var source in Model.sources)
-                {
-                    <a href="@source.url" style="text-decoration:none;color:inherit;">Source</a>
-                }
-            </td>
-        </tr>
-    </table>
+	<h5 class="mb-4">Discription:</h5>
+	<p>
+		@if (Model.description == null)
+		{
+			<span>
+				No description available
+			</span>
+		}
+		else
+		{
+			<span>
+				@Model.description
+			</span>
+		}
+	</p>
+
+	<p class="mb-4">
+		Categories:
+		@foreach (var categorie in Model.categories)
+		{
+			<span>@categorie.title </span>
+		}
+	</p>
+
+	<p class="mb-4">
+		Status: 
+		@if(Model.closed == null)
+		{
+			<span>not defined</span>
+		}
+		else
+		{
+			<span>@Model.closed</span>
+		}
+	</p>
+
+	<p>
+		source:
+		@for (int i = 0; i < Model.sources.Count(); i++)
+		{
+			<a href="@Model.sources[i].url" style="text-decoration:none;color:inherit;">Link @(i+1) </a>
+		}
+	</p>
+	<br />
+
+	<h5 class="mb-4">Affected Geometries:</h5>
+	<table class="table table-striped">
+		<tr>
+			<th>Value</th>
+			<th>Unit</th>
+			<th>Date</th>
+			<th>Type</th>
+			<th>Cordinates</th>
+		</tr>
+		@foreach (var item in Model.geometry)
+		{
+			<tr>
+				<td>@item.magnitudeValue</td>
+				<td>@item.magnitudeUnit</td>
+				<td>@item.date</td>
+				<td>@item.type</td>
+				<td>
+					@foreach (var coordinate in item.coordinates)
+					{
+						<span>@coordinate </span>
+					}
+				</td>
+			</tr>
+		}
+	</table>
 }
