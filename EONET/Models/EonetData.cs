@@ -54,6 +54,7 @@
         public DateTime? date { get; set; }
         public string? type { get; set; }
         public double[]? coordinates { get; set; }
+        public string? coordinatesUnit { get; set; }
     }
 }
 

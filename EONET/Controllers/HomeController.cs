@@ -26,7 +26,7 @@ namespace EONET.Controllers
         /// Index action that fetches data from the EONET API, deserializes it, and passes it to the view for display.
         /// </summary>
         /// <returns>A view displaying the list of events fetched from the EONET API.</returns>
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             try
             {
@@ -51,6 +51,12 @@ namespace EONET.Controllers
                     };
                 }).ToList() ?? new List<EonetData>();
 
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    viewModel = viewModel.Where(x => x._name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                                  x._county.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                                  x._state.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
 
                 //Sorts the viewModel based on the sortOrder parameter.
                 viewModel = sortOrder switch
@@ -79,9 +85,23 @@ namespace EONET.Controllers
 
             string json = await client.GetStringAsync($"{_configuration["EonetApiUrl"]}/{id}");
             //string json = await client.GetStringAsync(id);
-            var root = JsonSerializer.Deserialize<Event>(json, options);
+            var eventItem = JsonSerializer.Deserialize<Event>(json, options);
 
-            return View(root);
+            if (eventItem?.geometry != null)
+            {
+                foreach (var item in eventItem.geometry)
+                {
+                    if (item.coordinates != null && item.coordinates.Length >= 2)
+                    {
+                        var lng = item.coordinates[0].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        var lat = item.coordinates[1].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        item.coordinatesUnit = $"https://www.google.com/maps/search/@{lat},{lng},14z";
+                    }
+                }
+            }
+
+
+            return View(eventItem);
         }
 
 
