@@ -77,16 +77,20 @@ namespace EONET.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Details action that fetches detailed information about a specific event from the EONET API using the event ID, deserializes it, and passes it to the view for display.
+        /// </summary>
+        /// <param name="id">The ID of the event to fetch details for.</param>
+        /// <returns>A view displaying the detailed information of the specified event.</returns>
         public async Task<IActionResult> Details(string id)
         {
             using HttpClient client = new HttpClient();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             string json = await client.GetStringAsync($"{_configuration["EonetApiUrl"]}/{id}");
-            //string json = await client.GetStringAsync(id);
             var eventItem = JsonSerializer.Deserialize<Event>(json, options);
 
+            //Adds a Google Maps link to the geometry coordinates if they are available.
             if (eventItem?.geometry != null)
             {
                 foreach (var item in eventItem.geometry)
